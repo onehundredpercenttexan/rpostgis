@@ -51,7 +51,7 @@ dbTableNameFix <- function(conn=NULL, t.nm, as.identifier = TRUE) {
       }
     if (is.null(conn)) {conn<-DBI::ANSI()}
     if (!as.identifier) {return(t.nm)} else {
-    t.nm<-DBI::dbQuoteIdentifier(conn, DBI::dbQuoteIdentifier(conn, t.nm))
+    t.nm<-DBI::dbQuoteIdentifier(conn, t.nm)
     return(t.nm)
     }
 }
