@@ -69,3 +69,44 @@ dbVersion<- function (conn) {
       nv<-unlist(strsplit(pv,".",fixed=TRUE))
       return(as.numeric(nv))
 }
+
+
+## dbBuildTableQuery
+
+##' Builds CREATE TABLE query for a data frame object.
+##' 
+##' @param conn A PostgreSQL connection
+##' @param name Table name string, length 1-2.
+##' @param obj A data frame object.
+##' @param field.types optional named list of the types for each field in \code{obj}
+##' @param row.names logical, should row.name of \code{obj} be exported as a row_names field? Default is FALSE
+##' 
+##' @note Adapted from RPostgreSQL::postgresqlBuildTableDefinition
+##' @keywords internal
+
+dbBuildTableQuery <- function (conn = NULL, name, obj, field.types = NULL, row.names = FALSE) 
+{
+    if (is.null(conn)) {
+      conn <- DBI::ANSI()
+      nameque <- DBI::dbQuoteIdentifier(conn,name)
+    } else {
+      nameque<-paste(dbTableNameFix(conn, name),collapse = ".")
+    }
+  
+    if (!is.data.frame(obj)) 
+        obj <- as.data.frame(obj)
+    if (!is.null(row.names) && row.names) {
+        obj <- cbind(row.names(obj), obj)
+        names(obj)[1] <- "row_names"
+    }
+    if (is.null(field.types)) {
+        field.types <- sapply(obj, DBI::dbDataType, dbObj = conn)
+    }
+    i <- match("row_names", names(field.types), nomatch = 0)
+    if (i > 0) 
+        field.types[i] <- DBI::dbDataType(conn, row.names(obj))
+    flds <- paste(DBI::dbQuoteIdentifier(conn ,names(field.types)), field.types)
+    
+    paste("CREATE TABLE ", nameque , "\n(", paste(flds, 
+        collapse = ",\n\t"), "\n)")
+}

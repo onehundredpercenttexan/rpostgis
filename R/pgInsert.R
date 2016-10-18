@@ -136,7 +136,7 @@ pgInsert <- function(conn, name, data.obj, geom = "geom", partial.match = FALSE,
     ## Check for existing table
     exists.t <- dbExistsTable(conn, name)
     if (!exists.t) {
-        #message("Creating new table...")
+        message("Creating new table...")
         create.table <- name
         force.match <- NULL
     } else if (exists.t & overwrite & !partial.match) {
