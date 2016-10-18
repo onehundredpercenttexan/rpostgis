@@ -65,7 +65,7 @@ pgMakePts <- function(conn, name, colname = "geom", x = "x",
     }
     ## Execute the query
     if (exec)
-        dbSendQuery(conn, tmp.query)
+        dbExecute(conn, tmp.query)
     ## Create an index
     if (index) {
         ## The name of the index is enforced
@@ -96,7 +96,7 @@ pgMakePts <- function(conn, name, colname = "geom", x = "x",
     }
     ## Execute the query
     if (exec) {
-        dbSendQuery(conn, tmp.query)
+        dbExecute(conn, tmp.query)
         ## Return TRUE
         return(TRUE)
     }
@@ -152,7 +152,7 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
     }
     ## Execute the query
     if (exec)
-        dbSendQuery(conn, tmp.query)
+        dbExecute(conn, tmp.query)
     ## Create an index
     if (index) {
         ## The name of the index is enforced
@@ -188,7 +188,7 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
     }
     ## Execute the query
     if (exec) {
-        dbSendQuery(conn, tmp.query)
+        dbExecute(conn, tmp.query)
         ## Return TRUE
         return(TRUE)
     }

@@ -79,7 +79,7 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
             }
             ## Execute the query
             if (exec) 
-                dbSendQuery(conn, query)
+                dbExecute(conn, query)
             
             ## Should now be installed; stop if not:
             ext <- dbGetQuery(conn, "SELECT * FROM pg_available_extensions;")
@@ -117,7 +117,7 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
                 }
                 ## Execute the query
                 if (exec) 
-                  dbSendQuery(conn, query)
+                  dbExecute(conn, query)
             }
             ## Should now be installed; print a message if not:
             ext <- dbGetQuery(conn, "SELECT * FROM pg_available_extensions;")
@@ -154,7 +154,7 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
                   }
                   ## Execute the query
                   if (exec) 
-                    dbSendQuery(conn, query)
+                    dbExecute(conn, query)
                 }
             }
             ## Should now be installed; print a message if not:
@@ -187,7 +187,7 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
                 }
                 ## Execute the query
                 if (exec) 
-                  dbSendQuery(conn, query)
+                  dbExecute(conn, query)
             }
             ## Should now be installed; print a message if not:
             ext <- dbGetQuery(conn, "SELECT * FROM pg_available_extensions;")

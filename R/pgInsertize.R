@@ -201,7 +201,7 @@ pgInsertizeGeom <- function(data.obj, geom = "geom", create.table = NULL,
         }
         add.geom <- paste0("ALTER TABLE ", nt[1], ".", nt[2],
             " ADD COLUMN ", geom, " geometry(", pgtype, ");")
-        new.table <- paste0(new.table, "; ", add.geom)
+        new.table[2] <- add.geom
     }
     if (!is.null(force.match)) {
         if (is.null(conn)) {
