@@ -127,7 +127,7 @@ pgSRID <- function(conn, crs, create.srid = FALSE, new.srid = NULL) {
     temp.query <- paste0("INSERT INTO spatial_ref_sys (srid,auth_name,auth_srid,srtext,proj4text) VALUES (", 
         srid, ",'rpostgis_custom',", srid, ",'", proj.wkt, "','", 
         p4s, "');")
-    dbExecute(conn, temp.query)
+    dbSendStatement(conn, temp.query)
     message(paste0("No matches were found in spatial_ref_sys. New SRID created (", 
         srid, ")."))
     return(srid)

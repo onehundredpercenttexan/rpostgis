@@ -108,5 +108,5 @@ dbBuildTableQuery <- function (conn = NULL, name, obj, field.types = NULL, row.n
     flds <- paste(DBI::dbQuoteIdentifier(conn ,names(field.types)), field.types)
     
     paste("CREATE TABLE ", nameque , "\n(", paste(flds, 
-        collapse = ",\n\t"), "\n)")
+        collapse = ",\n\t"), "\n);")
 }
