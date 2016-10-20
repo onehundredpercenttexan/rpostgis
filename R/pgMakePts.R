@@ -55,17 +55,17 @@ pgMakePts <- function(conn, name, colname = "geom", x = "x",
     ## --
     ## ALTER TABLE "<schema>"."<table>" ADD COLUMN "<colname>" geometry(POINT, <srid>);
     ## --
-    tmp.query <- paste0("ALTER TABLE ", nameque, " ADD COLUMN ",
+    sql_query <- paste0("ALTER TABLE ", nameque, " ADD COLUMN ",
         colnameque, " geometry(POINT, ", srid, ");")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Create an index
     if (index) {
         ## The name of the index is enforced
@@ -85,18 +85,18 @@ pgMakePts <- function(conn, name, colname = "geom", x = "x",
     ## SET "<colname>" = ST_SetSRID(ST_MakePoint("<x>", "<y>"), <srid>)
     ## WHERE "<x>" IS NOT NULL AND "<y>" IS NOT NULL;
     ## --
-    tmp.query <- paste0("UPDATE ", nameque, "\nSET ", colnameque,
+    sql_query <- paste0("UPDATE ", nameque, "\nSET ", colnameque,
         " = ST_SetSRID(ST_MakePoint(", x, ", ", y, "), ", srid,
         ")\nWHERE ", x, " IS NOT NULL AND ", y, " IS NOT NULL;")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec) {
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
         ## Return TRUE
         return(TRUE)
     }
@@ -142,17 +142,17 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
     ## --
     ## ALTER TABLE "<schema>"."<table>" ADD COLUMN "<colname>" geometry(LINESTRING, <srid>);
     ## --
-    tmp.query <- paste0("ALTER TABLE ", nameque, " ADD COLUMN ",
+    sql_query <- paste0("ALTER TABLE ", nameque, " ADD COLUMN ",
         colnameque, " geometry(LINESTRING, ", srid, ");")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Create an index
     if (index) {
         ## The name of the index is enforced
@@ -175,7 +175,7 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
     ##     ), <srid>)
     ## WHERE "<x>" IS NOT NULL AND "<y>" IS NOT NULL;
     ## --
-    tmp.query <- paste0("UPDATE ", nameque, "\nSET ", colnameque,
+    sql_query <- paste0("UPDATE ", nameque, "\nSET ", colnameque,
         " = ST_SetSRID(ST_MakeLine(\n    ARRAY[ST_MakePoint(",
         x, ", ", y, "), ", "\n          ST_MakePoint(", x, " + ",
         dx, ", ", y, " + ", dy, ")]\n    ), ", srid, ")\nWHERE ",
@@ -183,12 +183,12 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec) {
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
         ## Return TRUE
         return(TRUE)
     }

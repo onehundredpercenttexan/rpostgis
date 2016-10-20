@@ -40,9 +40,9 @@ pgGetRast <- function(conn, name, rast = "rast", digits = 9,
     nameque <- paste(name, collapse = ".")
     namechar <- gsub("'","''",paste(gsub('^"|"$', '', name),collapse="."))
     ## Check table exists
-    tmp.query <- paste0("SELECT r_raster_column AS geo FROM raster_columns\n  WHERE (r_table_schema||'.'||r_table_name) = '",
+    sql_query <- paste0("SELECT r_raster_column AS geo FROM raster_columns\n  WHERE (r_table_schema||'.'||r_table_name) = '",
                         namechar, "';")
-    tab.list <- dbGetQuery(conn, tmp.query)$geo
+    tab.list <- dbGetQuery(conn, sql_query)$geo
     if (is.null(tab.list)) {
         stop(paste0("Table '", namechar, "' is not listed in raster_columns."))
     } else if (!rast %in% tab.list) {
@@ -51,9 +51,9 @@ pgGetRast <- function(conn, name, rast = "rast", digits = 9,
                 collapse = ", ")))
     }
     ## Retrieve the SRID
-    tmp.query <- paste0("SELECT DISTINCT(ST_SRID(", rast, ")) FROM ",
+    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", rast, ")) FROM ",
         nameque, " WHERE ", rast, " IS NOT NULL;")
-    srid <- dbGetQuery(conn, tmp.query)
+    srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
         stop("Multiple SRIDs in the raster")
@@ -61,9 +61,9 @@ pgGetRast <- function(conn, name, rast = "rast", digits = 9,
         stop("Database table is empty.")
     }
     p4s <- sp::CRS(as.character(NA))@projargs
-    tmp.query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
+    sql_query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
                         srid$st_srid, ";")
-    db.proj4 <- dbGetQuery(conn, tmp.query)$p4s
+    db.proj4 <- dbGetQuery(conn, sql_query)$p4s
     if (!is.null(db.proj4)) {
       try(p4s <- sp::CRS(db.proj4)@projargs, silent = TRUE)
     }

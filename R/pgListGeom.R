@@ -32,19 +32,19 @@ pgListGeom <- function(conn, display = TRUE, exec = TRUE) {
     ##     type AS geometry_type
     ## FROM geometry_columns;
     ## --
-    tmp.query <- paste("SELECT", "    f_table_schema AS schema_name,",
+    sql_query <- paste("SELECT", "    f_table_schema AS schema_name,",
         "    f_table_name AS table_name,", "    f_geometry_column AS geom_column,",
         "    type AS geometry_type", "FROM geometry_columns;",
         sep = "\n")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query and return it if successful
     if (exec) {
-        tab <- dbGetQuery(conn, tmp.query)
+        tab <- dbGetQuery(conn, sql_query)
         return(tab)
     }
 }

@@ -60,19 +60,19 @@ pgSRID <- function(conn, crs, create.srid = FALSE, new.srid = NULL) {
     epsg.ext <- regmatches(p4s, regexpr("init=epsg:(\\d*)", p4s))
     if (length(epsg.ext) == 1) {
         epsg <- strsplit(epsg.ext, ":")[[1]][2]
-        temp.query <- paste0("SELECT srid FROM spatial_ref_sys WHERE auth_name = 'EPSG' AND auth_srid = ", 
+        sql_query <- paste0("SELECT srid FROM spatial_ref_sys WHERE auth_name = 'EPSG' AND auth_srid = ", 
             epsg, ";")
-        srid <- dbGetQuery(conn, temp.query)$srid
+        srid <- dbGetQuery(conn, sql_query)$srid
         if (length(srid) > 0) {
             return(srid)
         }
     }
     ## check for matching p4s in spatial_ref_sys (with or without
     ## trailing white space)
-    temp.query <- paste0("SELECT srid FROM spatial_ref_sys\nWHERE\n(proj4text = '", 
+    sql_query <- paste0("SELECT srid FROM spatial_ref_sys\nWHERE\n(proj4text = '", 
         p4s, "'\n OR\n regexp_replace(proj4text,'[[:space:]]+$','') = '", 
         p4s, "');")
-    srid <- dbGetQuery(conn, temp.query)$srid
+    srid <- dbGetQuery(conn, sql_query)$srid
     
     if (length(srid) > 0) {
         return(srid)
@@ -84,9 +84,9 @@ pgSRID <- function(conn, crs, create.srid = FALSE, new.srid = NULL) {
         epsg <- "OGRERR_UNSUPPORTED_SRS"
         try(epsg <- rgdal::showEPSG(p4s))
         if (epsg != "OGRERR_UNSUPPORTED_SRS") {
-            temp.query <- paste0("SELECT srid FROM spatial_ref_sys WHERE auth_name = 'EPSG' AND auth_srid = ", 
+            sql_query <- paste0("SELECT srid FROM spatial_ref_sys WHERE auth_name = 'EPSG' AND auth_srid = ", 
                 epsg, ";")
-            srid <- dbGetQuery(conn, temp.query)$srid
+            srid <- dbGetQuery(conn, sql_query)$srid
             if (length(srid) > 0) {
                 return(srid)
             }
@@ -98,9 +98,9 @@ pgSRID <- function(conn, crs, create.srid = FALSE, new.srid = NULL) {
     ## if none of the above methods worked, create new SRID
     if (!is.null(new.srid)) {
         ## check if exists
-        temp.query <- paste0("SELECT srid FROM spatial_ref_sys WHERE srid = ", 
+        sql_query <- paste0("SELECT srid FROM spatial_ref_sys WHERE srid = ", 
             new.srid, ";")
-        check.srid <- dbGetQuery(conn, temp.query)
+        check.srid <- dbGetQuery(conn, sql_query)
         if (length(check.srid) > 0) {
             stop(paste0("SRID ", new.srid, " already exists in 'spatial_ref_sys'.\nSelect another 'new.srid' or leave it to 'NULL' to select the next open SRID between 880000 and 889999."))
         }
@@ -108,8 +108,8 @@ pgSRID <- function(conn, crs, create.srid = FALSE, new.srid = NULL) {
     } else {
         ## find next SRID for custom set (prefix 88, first value =
         ## 880001)
-        temp.query <- "SELECT min(series) AS new FROM generate_series(880001,890000) AS series WHERE series NOT IN\n  (SELECT srid FROM spatial_ref_sys WHERE srid > 880000 AND srid < 890000)"
-        new.srid <- dbGetQuery(conn, temp.query)$new
+        sql_query <- "SELECT min(series) AS new FROM generate_series(880001,890000) AS series WHERE series NOT IN\n  (SELECT srid FROM spatial_ref_sys WHERE srid > 880000 AND srid < 890000)"
+        new.srid <- dbGetQuery(conn, sql_query)$new
         if (is.na(new.srid)) {
             stop("No available SRIDs between 880001 and 889999. Delete some or manually set 'new.srid'.")
         } else {
@@ -124,10 +124,10 @@ pgSRID <- function(conn, crs, create.srid = FALSE, new.srid = NULL) {
         message("Package 'rgdal' is not installed.\nNew SRID will be created, but 'srtext' column (WKT representation of projection) will be 'NA'.")
     }
     ## insert new SRID
-    temp.query <- paste0("INSERT INTO spatial_ref_sys (srid,auth_name,auth_srid,srtext,proj4text) VALUES (", 
+    sql_query <- paste0("INSERT INTO spatial_ref_sys (srid,auth_name,auth_srid,srtext,proj4text) VALUES (", 
         srid, ",'rpostgis_custom',", srid, ",'", proj.wkt, "','", 
         p4s, "');")
-    dbSendStatement(conn, temp.query)
+    dbSendStatement(conn, sql_query)
     message(paste0("No matches were found in spatial_ref_sys. New SRID created (", 
         srid, ")."))
     return(srid)

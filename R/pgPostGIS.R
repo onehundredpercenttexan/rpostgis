@@ -69,17 +69,17 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
             message(paste0("Installing PostGIS extension version ", 
                 post$default_version), ":")
             ## Build the query
-            query <- paste0("CREATE EXTENSION postgis;")
+            sql_query <- paste0("CREATE EXTENSION postgis;")
             ## Display the query
             if (display) {
                 message(paste0("Query ", ifelse(exec, "", "not "), 
                   "executed:"))
-                message(query)
+                message(sql_query)
                 message("--")
             }
             ## Execute the query
             if (exec) 
-                dbExecute(conn, query)
+                dbExecute(conn, sql_query)
             
             ## Should now be installed; stop if not:
             ext <- dbGetQuery(conn, "SELECT * FROM pg_available_extensions;")
@@ -107,17 +107,17 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
                 message(paste0("Installing PostGIS Topology extension version ", 
                   topo$default_version), ":")
                 ## Build the query
-                query <- paste0("CREATE EXTENSION postgis_topology;")
+                sql_query <- paste0("CREATE EXTENSION postgis_topology;")
                 ## Display the query
                 if (display) {
                   message(paste0("Query ", ifelse(exec, "", "not "), 
                     "executed:"))
-                  message(query)
+                  message(sql_query)
                   message("--")
                 }
                 ## Execute the query
                 if (exec) 
-                  dbExecute(conn, query)
+                  dbExecute(conn, sql_query)
             }
             ## Should now be installed; print a message if not:
             ext <- dbGetQuery(conn, "SELECT * FROM pg_available_extensions;")
@@ -143,18 +143,18 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
                   message(paste0("Installing ", tiger$name[i], 
                     " extension version ", tiger$default_version[i]), 
                     ":")
-                  query <- paste0("CREATE EXTENSION ", tiger$name[i], 
+                  sql_query <- paste0("CREATE EXTENSION ", tiger$name[i], 
                     ";")
                   ## Display the query
                   if (display) {
                     message(paste0("Query ", ifelse(exec, "", 
                       "not "), "executed:"))
-                    message(query)
+                    message(sql_query)
                     message("--")
                   }
                   ## Execute the query
                   if (exec) 
-                    dbExecute(conn, query)
+                    dbExecute(conn, sql_query)
                 }
             }
             ## Should now be installed; print a message if not:
@@ -177,17 +177,17 @@ pgPostGIS <- function(conn, topology = FALSE, tiger = FALSE,
                 message(paste0("Installing PostGIS SFCGAL extension version ", 
                   sfc$default_version), ":")
                 ## Build the query
-                query <- paste0("CREATE EXTENSION postgis_sfcgal;")
+                sql_query <- paste0("CREATE EXTENSION postgis_sfcgal;")
                 ## Display the query
                 if (display) {
                   message(paste0("Query ", ifelse(exec, "", "not "), 
                     "executed:"))
-                  message(query)
+                  message(sql_query)
                   message("--")
                 }
                 ## Execute the query
                 if (exec) 
-                  dbExecute(conn, query)
+                  dbExecute(conn, sql_query)
             }
             ## Should now be installed; print a message if not:
             ext <- dbGetQuery(conn, "SELECT * FROM pg_available_extensions;")

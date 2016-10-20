@@ -256,9 +256,9 @@ pgInsert <- function(conn, name, data.obj, geom = "geom", partial.match = FALSE,
     cols2 <- paste0("(", paste(dbQuoteIdentifier(conn,cols), collapse = ","), ")")
     quei <- NULL
     ## Send insert query
-    temp.query<-paste0("INSERT INTO ", nameque[1], 
+    sql_query<-paste0("INSERT INTO ", nameque[1], 
         ".", nameque[2], cols2, " VALUES ", values, up.query,";")
-    try(quei <- dbExecute(conn, temp.query))
+    try(quei <- dbExecute(conn, sql_query))
     if (!is.null(quei)) {
         dbExecute(conn, "COMMIT;")
         message(paste0("Data inserted into table ",nameque[1],".",nameque[2]))

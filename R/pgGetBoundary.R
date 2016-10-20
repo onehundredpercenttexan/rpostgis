@@ -32,12 +32,12 @@ pgGetBoundary <- function(conn, name, geom = "geom") {
     nameque <- paste(name, collapse = ".")
     namechar <- gsub("'","''",paste(gsub('^"|"$', '', name),collapse="."))
     ## Check table exists
-    tmp.query <- paste0("SELECT geo FROM\n  (SELECT (gc.f_table_schema||'.'||gc.f_table_name) AS tab,
+    sql_query <- paste0("SELECT geo FROM\n  (SELECT (gc.f_table_schema||'.'||gc.f_table_name) AS tab,
                         gc.f_geometry_column AS geo\n   FROM geometry_columns AS gc\n   UNION\n   
                         SELECT rc.r_table_schema||'.'||rc.r_table_name AS tab, rc.r_raster_column AS geo\n   
                         FROM raster_columns as rc) a\n  WHERE tab  = '",
                         namechar, "';")
-    tab.list <- dbGetQuery(conn, tmp.query)$geo
+    tab.list <- dbGetQuery(conn, sql_query)$geo
     if (is.null(tab.list)) {
         stop(paste0("Table/view '", namechar, "' is not listed in geometry_columns or raster_columns."))
     } else if (!geom %in% tab.list) {
@@ -45,9 +45,9 @@ pgGetBoundary <- function(conn, name, geom = "geom") {
             paste(tab.list, collapse = ", ")))
     }
     ## Check data type
-    tmp.query <- paste0("SELECT DISTINCT pg_typeof(", geom, ") AS type FROM ",
+    sql_query <- paste0("SELECT DISTINCT pg_typeof(", geom, ") AS type FROM ",
         nameque, "\n  WHERE ", geom, " IS NOT NULL;")
-    type <- suppressWarnings(dbGetQuery(conn, tmp.query))
+    type <- suppressWarnings(dbGetQuery(conn, sql_query))
     if (type$type == "raster") {
         func <- "ST_Union"
     } else if (type$type == "geometry") {
@@ -56,9 +56,9 @@ pgGetBoundary <- function(conn, name, geom = "geom") {
         stop(paste0("Column", geom, " does not contain geometries or rasters"))
     }
     ## Retrieve the SRID
-    tmp.query <- paste0("SELECT DISTINCT(ST_SRID(", geom, ")) FROM ",
+    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geom, ")) FROM ",
         nameque, " WHERE ", geom, " IS NOT NULL;")
-    srid <- dbGetQuery(conn, tmp.query)
+    srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
       stop("Multiple SRIDs in geometry/raster")
@@ -66,9 +66,9 @@ pgGetBoundary <- function(conn, name, geom = "geom") {
       stop("Database table is empty.")
     }
     p4s <- sp::CRS(as.character(NA))@projargs
-    tmp.query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
+    sql_query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
                         srid$st_srid, ";")
-    db.proj4 <- dbGetQuery(conn, tmp.query)$p4s
+    db.proj4 <- dbGetQuery(conn, sql_query)$p4s
     if (!is.null(db.proj4)) {
       try(p4s <- sp::CRS(db.proj4)@projargs, silent = TRUE)
     }
@@ -76,9 +76,9 @@ pgGetBoundary <- function(conn, name, geom = "geom") {
       warning("Table SRID not found. Projection will be undefined (NA)")
     }
     ## Retrieve envelope
-    tmp.query <- paste0("SELECT ST_Astext(ST_Envelope(", func,
+    sql_query <- paste0("SELECT ST_Astext(ST_Envelope(", func,
         "(", geom, "))) FROM ", nameque, " WHERE ", geom, " IS NOT NULL;")
-    wkt <- suppressWarnings(dbGetQuery(conn, tmp.query))
+    wkt <- suppressWarnings(dbGetQuery(conn, sql_query))
     env <- rgeos::readWKT(wkt$st_astext, p4s = p4s)
     return(env)
 }

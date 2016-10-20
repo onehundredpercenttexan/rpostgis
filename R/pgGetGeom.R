@@ -56,10 +56,10 @@ pgGetGeom <- function(conn, name, geom = "geom", gid = NULL,
     namechar <- gsub("\"\"", "\"", gsub("'", "''", paste(gsub("^\"|\"$", 
         "", dbTableNameFix(conn,name)), collapse = ".")))
     ## Check table exists
-    tmp.query <- paste0("SELECT f_geometry_column AS geo FROM geometry_columns\nWHERE 
+    sql_query <- paste0("SELECT f_geometry_column AS geo FROM geometry_columns\nWHERE 
         (f_table_schema||'.'||f_table_name) = '", 
         namechar, "';")
-    tab.list <- dbGetQuery(conn, tmp.query)$geo
+    tab.list <- dbGetQuery(conn, sql_query)$geo
     if (is.null(tab.list)) {
         stop(paste0("Table/view '", namechar, "' is not listed in geometry_columns."))
     } else if (!geom %in% tab.list) {
@@ -82,10 +82,10 @@ pgGetGeom <- function(conn, name, geom = "geom", gid = NULL,
         }
     }
     ## check type
-    tmp.query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque, 
+    sql_query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque, 
         ") AS type FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ", 
         clauses, ";")
-    typ <- dbGetQuery(conn, tmp.query)$type
+    typ <- dbGetQuery(conn, sql_query)$type
     # assign to correct function
     if (length(typ) == 0) {
         stop("No geometries found.")
@@ -161,14 +161,14 @@ pgGetPts <- function(conn, name, geom = "geom", gid = NULL, other.cols = "*",
       gid<-DBI::dbQuoteIdentifier(conn,gid)
     }
     ## Check if MULTI or single geom
-    tmp.query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque,
+    sql_query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque,
         ") AS type FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ",
         clauses , ";")
-    typ <- dbGetQuery(conn, tmp.query)
+    typ <- dbGetQuery(conn, sql_query)
     ## Retrieve the SRID
-    tmp.query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
+    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
         nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
-    srid <- dbGetQuery(conn, tmp.query)
+    srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
         stop("Multiple SRIDs in the point geometry")
@@ -176,9 +176,9 @@ pgGetPts <- function(conn, name, geom = "geom", gid = NULL, other.cols = "*",
         stop("Database table is empty.")
     }
     proj4 <- sp::CRS(as.character(NA))
-    tmp.query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
+    sql_query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
         srid$st_srid, ";")
-    db.proj4 <- dbGetQuery(conn, tmp.query)$p4s
+    db.proj4 <- dbGetQuery(conn, sql_query)$p4s
     if (!is.null(db.proj4)) {
         try(proj4 <- sp::CRS(db.proj4), silent = TRUE)
     }
@@ -189,17 +189,17 @@ pgGetPts <- function(conn, name, geom = "geom", gid = NULL, other.cols = "*",
     if (length(typ$type) == 1 && typ$type == "ST_Point") {
         ## Get data
         if (is.null(other.cols)) {
-            tmp.query <- paste0("SELECT ", gid, " AS tgid,ST_X(",
+            sql_query <- paste0("SELECT ", gid, " AS tgid,ST_X(",
                 geomque, ") AS x, ST_Y(", geomque, ") AS y FROM ",
                 nameque, " WHERE ", geomque, " IS NOT NULL ", clauses ,
                 ";")
         } else {
-            tmp.query <- paste0("SELECT ", gid, " AS tgid,ST_X(",
+            sql_query <- paste0("SELECT ", gid, " AS tgid,ST_X(",
                 geomque, ") AS x, ST_Y(", geomque, ") AS y,", other.cols,
                 " FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ",
                 clauses , ";")
         }
-        dbData <- suppressWarnings(dbGetQuery(conn, tmp.query))
+        dbData <- suppressWarnings(dbGetQuery(conn, sql_query))
         row.names(dbData) <- dbData$tgid
         ## Generate a SpatialPoints object
         sp <- sp::SpatialPoints(data.frame(x = dbData$x, y = dbData$y,
@@ -214,15 +214,15 @@ pgGetPts <- function(conn, name, geom = "geom", gid = NULL, other.cols = "*",
     } else {
         ## Make SpatialMultiPoints(Dataframe) for multi-point types
         if (is.null(other.cols)) {
-            tmp.query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
+            sql_query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
                 geomque, ") AS wkt FROM ", nameque, " WHERE ", geomque,
                 " IS NOT NULL ", clauses , ";")
         } else {
-            tmp.query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
+            sql_query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
                 geomque, ") AS wkt,", other.cols, " FROM ", nameque,
                 " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
         }
-        dbData <- suppressWarnings(dbGetQuery(conn, tmp.query))
+        dbData <- suppressWarnings(dbGetQuery(conn, sql_query))
         row.names(dbData) <- dbData$tgid
         ## Create spatialMultiPoints
         tt <- mapply(function(x, y, z) rgeos::readWKT(x, y, z),
@@ -280,9 +280,9 @@ pgGetLines <- function(conn, name, geom = "geom", gid = NULL,
       gid<-DBI::dbQuoteIdentifier(conn,gid)
     }
     ## Retrieve the SRID
-    tmp.query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
+    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
         nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
-    srid <- dbGetQuery(conn, tmp.query)
+    srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
         stop("Multiple SRIDs in the linestring geometry.")
@@ -290,9 +290,9 @@ pgGetLines <- function(conn, name, geom = "geom", gid = NULL,
         stop("Database table is empty.")
     }
     p4s <- sp::CRS(as.character(NA))@projargs
-    tmp.query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
+    sql_query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
         srid$st_srid, ";")
-    db.proj4 <- dbGetQuery(conn, tmp.query)$p4s
+    db.proj4 <- dbGetQuery(conn, sql_query)$p4s
     if (!is.null(db.proj4)) {
         try(p4s <- sp::CRS(db.proj4)@projargs, silent = TRUE)
     }
@@ -301,16 +301,16 @@ pgGetLines <- function(conn, name, geom = "geom", gid = NULL,
     }
     ## Check other.cols
     if (is.null(other.cols)) {
-        tmp.query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
+        sql_query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
             geomque, ") AS wkt FROM ", nameque, " WHERE ", geomque,
             " IS NOT NULL ", clauses , ";")
-        dfTemp <- suppressWarnings(dbGetQuery(conn, tmp.query))
+        dfTemp <- suppressWarnings(dbGetQuery(conn, sql_query))
         row.names(dfTemp) <- dfTemp$tgid
     } else {
-        tmp.query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
+        sql_query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
             geomque, ") AS wkt,", other.cols, " FROM ", nameque,
             " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
-        dfTemp <- suppressWarnings(dbGetQuery(conn, tmp.query))
+        dfTemp <- suppressWarnings(dbGetQuery(conn, sql_query))
         row.names(dfTemp) <- dfTemp$tgid
     }
     ## Make SpatialLines
@@ -374,9 +374,9 @@ pgGetPolys <- function(conn, name, geom = "geom", gid = NULL,
       gid<-DBI::dbQuoteIdentifier(conn,gid)
     }
     ## Retrieve the SRID
-    tmp.query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
+    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
         nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
-    srid <- dbGetQuery(conn, tmp.query)
+    srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
         stop("Multiple SRIDs in the polygon geometry")
@@ -384,9 +384,9 @@ pgGetPolys <- function(conn, name, geom = "geom", gid = NULL,
         stop("Database table is empty.")
     }
     p4s <- sp::CRS(as.character(NA))@projargs
-    tmp.query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
+    sql_query <- paste0("SELECT proj4text AS p4s FROM spatial_ref_sys WHERE srid = ",
         srid$st_srid, ";")
-    db.proj4 <- dbGetQuery(conn, tmp.query)$p4s
+    db.proj4 <- dbGetQuery(conn, sql_query)$p4s
     if (!is.null(db.proj4)) {
         try(p4s <- sp::CRS(db.proj4)@projargs, silent = TRUE)
     }
@@ -395,16 +395,16 @@ pgGetPolys <- function(conn, name, geom = "geom", gid = NULL,
     }
     ## Check other columns
     if (is.null(other.cols)) {
-        tmp.query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
+        sql_query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
             geomque, ") AS wkt FROM ", nameque, " WHERE ", geomque,
             " IS NOT NULL ", clauses , ";")
-        dfTemp <- suppressWarnings(dbGetQuery(conn, tmp.query))
+        dfTemp <- suppressWarnings(dbGetQuery(conn, sql_query))
         row.names(dfTemp) <- dfTemp$tgid
     } else {
-        tmp.query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
+        sql_query <- paste0("SELECT ", gid, " AS tgid,st_astext(",
             geomque, ") AS wkt,", other.cols, " FROM ", nameque,
             " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
-        dfTemp <- suppressWarnings(dbGetQuery(conn, tmp.query))
+        dfTemp <- suppressWarnings(dbGetQuery(conn, sql_query))
         row.names(dfTemp) <- dfTemp$tgid
     }
     tt <- mapply(function(x, y, z) rgeos::readWKT(x, y, z), x = dfTemp[,

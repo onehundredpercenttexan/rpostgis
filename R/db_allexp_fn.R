@@ -58,17 +58,17 @@ dbAddKey <- function(conn, name, colname, type = c("primary",
             colref, ")")
     }
     ## Build the query
-    tmp.query <- paste0("ALTER TABLE ", nameque, " ADD ", type,
+    sql_query <- paste0("ALTER TABLE ", nameque, " ADD ", type,
         " KEY (", colname, ")", references, ";")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Return TRUE
     return(TRUE)
 }
@@ -120,18 +120,18 @@ dbAsDate <- function(conn, name, date = "date", tz = NULL, display = TRUE,
     ##     USING
     ##         '<date>'::timestamp AT TIME ZONE '<tz>';
     ## --
-    tmp.query <- paste0("ALTER TABLE ", nameque, "\n    ALTER COLUMN ",
+    sql_query <- paste0("ALTER TABLE ", nameque, "\n    ALTER COLUMN ",
         date, " TYPE ", timestamp, "\n    USING\n        ", date,
         "::timestamp", tz, ";")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query and return TRUE
     if (exec) {
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
         return(TRUE)
     }
 }
@@ -184,17 +184,17 @@ dbColumn <- function(conn, name, colname, action = c("add", "drop"),
     args <- ifelse(action == "ADD", coltype, ifelse(cascade,
         "CASCADE", ""))
     ## Build the query
-    tmp.query <- paste0("ALTER TABLE ", nameque, " ", action, " COLUMN ",
+    sql_query <- paste0("ALTER TABLE ", nameque, " ", action, " COLUMN ",
         colname, " ", args, ";")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Return TRUE
     return(TRUE)
 }
@@ -244,17 +244,17 @@ dbComment <- function(conn, name, comment, type = c("table",
     ## Escape single "'"
     comment<-gsub("'","''",comment)
     ## Build the query
-    tmp.query <- paste0("COMMENT ON ", type, " ", nameque, " IS '",
+    sql_query <- paste0("COMMENT ON ", type, " ", nameque, " IS '",
         comment, "';")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Return nothing
     return(TRUE)
 }
@@ -310,17 +310,17 @@ dbDrop <- function(conn, name, type = c("table", "view", "schema"),
     ## Argument CASCADE
     cascade <- ifelse(cascade, " CASCADE", "")
     ## Build the query
-    tmp.query <- paste0("DROP ", type, ifexists, nameque, cascade,
+    sql_query <- paste0("DROP ", type, ifexists, nameque, cascade,
         ";")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Return nothing
     return(TRUE)
 }
@@ -389,17 +389,17 @@ dbIndex <- function(conn, name, colname, idxname, unique = FALSE,
     usemeth <- ifelse(method == "btree", "", paste(" USING",
         toupper(method)))
     ## Build the query
-    tmp.query <- paste0("CREATE ", unique, "INDEX ", idxname,
+    sql_query <- paste0("CREATE ", unique, "INDEX ", idxname,
         " ON ", nameque, usemeth, " (", colname, ");")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Return TRUE
     return(TRUE)
 }
@@ -441,24 +441,24 @@ dbSchema <- function(conn, name, display = TRUE, exec = TRUE) {
     namechar<-DBI::dbQuoteString(conn,name)
     nameque<-DBI::dbQuoteIdentifier(conn,name)
     ## Check existence of the schema
-    tmp.query <- paste0("SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = ",
+    sql_query <- paste0("SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = ",
         namechar, ");")
-    schema <- dbGetQuery(conn, tmp.query)[1, 1]
+    schema <- dbGetQuery(conn, sql_query)[1, 1]
     ## If exists, return TRUE, otherwise create the schema
     if (isTRUE(schema))
         return(TRUE) else {
         ## Build the query
-        tmp.query <- paste0("CREATE SCHEMA ", nameque[1], ";")
+        sql_query <- paste0("CREATE SCHEMA ", nameque[1], ";")
         ## Display the query
         if (display) {
             message(paste0("Query ", ifelse(exec, "", "not "),
                 "executed:"))
-            message(tmp.query)
+            message(sql_query)
             message("--")
         }
         ## Execute the query
         if (exec)
-            dbExecute(conn, tmp.query)
+            dbExecute(conn, sql_query)
         ## Return nothing
         return(TRUE)
     }
@@ -546,17 +546,17 @@ dbVacuum <- function(conn, name, full = FALSE, verbose = FALSE,
     ## Argument ANALYZE
     analyze <- ifelse(analyze, "ANALYZE ", "")
     ## Build the query
-    tmp.query <- paste0("VACUUM ", full, verbose, analyze, nameque,
+    sql_query <- paste0("VACUUM ", full, verbose, analyze, nameque,
         ";")
     ## Display the query
     if (display) {
         message(paste0("Query ", ifelse(exec, "", "not "), "executed:"))
-        message(tmp.query)
+        message(sql_query)
         message("--")
     }
     ## Execute the query
     if (exec)
-        dbExecute(conn, tmp.query)
+        dbExecute(conn, sql_query)
     ## Return TRUE
     return(TRUE)
 }
