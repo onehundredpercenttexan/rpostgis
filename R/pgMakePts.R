@@ -75,7 +75,7 @@ pgMakePts <- function(conn, name, colname = "geom", x = "x",
         ## --
         ## CREATE INDEX "<table>_<colname>_idx" ON "<schema>"."<table>" USING GIST ("<colname>");
         ## --
-        dbIndex(conn = conn, name = name, colname = colnameque,
+        dbIndex(conn = conn, name = name, colname = colname,
             idxname = idxname, method = "gist", display = display,
             exec = exec)
     }
@@ -162,7 +162,7 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
         ## --
         ## CREATE INDEX "<table>_<colname>_idx" ON "<schema>"."<table>" USING GIST ("<colname>");
         ## --
-        dbIndex(conn = conn, name = name, colname = colnameque,
+        dbIndex(conn = conn, name = name, colname = colname,
             idxname = idxname, method = "gist", display = display,
             exec = exec)
     }

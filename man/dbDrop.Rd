@@ -13,7 +13,7 @@ dbDrop(conn, name, type = c("table", "view", "schema"), ifexists = FALSE,
 \item{name}{A character string specifying a PostgreSQL table, view
 or schema name.}
 
-\item{type}{The type of the object to comment, either \code{table}
+\item{type}{The type of the object to drop, either \code{table}
 or \code{view}}
 
 \item{ifexists}{Do not throw an error if the table does not

@@ -35,7 +35,6 @@
 ##'
 ##' @docType package
 ##' @name rpostgis
-##' @import RPostgreSQL
 ##' @import DBI
 ##' @importFrom methods slot "slot<-"
 ##' @author Mathieu Basille (\email{basille@@ufl.edu}) and David

@@ -15,7 +15,6 @@ SystemRequirements:
     'PostgreSQL' with 'PostGIS' extension
 Depends:
     R (>= 3.3.0),
-    RPostgreSQL,
     DBI
 Imports:
     methods,

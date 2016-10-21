@@ -270,7 +270,7 @@ dbComment <- function(conn, name, comment, type = c("table",
 ##' @param conn A connection object.
 ##' @param name A character string specifying a PostgreSQL table, view
 ##'     or schema name.
-##' @param type The type of the object to comment, either \code{table}
+##' @param type The type of the object to drop, either \code{table}
 ##'     or \code{view}
 ##' @param ifexists Do not throw an error if the table does not
 ##'     exist. A notice is issued in this case.

@@ -134,7 +134,11 @@ pgInsert <- function(conn, name, data.obj, geom = "geom", partial.match = FALSE,
         }
     }
     ## Check for existing table
-    exists.t <- dbExistsTable(conn, name)
+    full.name<-dbTableNameFix(conn,name, as.identifier = FALSE)
+    chk<-dbGetQuery(conn, paste0("SELECT 1 FROM information_schema.tables 
+               WHERE table_schema = ",dbQuoteString(conn,full.name[1]),
+               " AND table_name = ",dbQuoteString(conn,full.name[2]),";"))[1,1]
+    if (is.null(chk) || is.na(chk)) {exists.t<-FALSE} else {exists.t<-TRUE}
     if (!exists.t) {
         message("Creating new table...")
         create.table <- name

@@ -1,3 +1,12 @@
+rpostgis 1.0.3
+==============
+OVERALL CHANGE
+
+* dependency on RPostgreSQL removed by using base DBI functions for SQL calls
+
+* supports drivers from both RPostgreSQL ("PostgreSQL") 
+  and RPostgres (Postgres()) packages
+
 rpostgis 1.0.2
 =============
 OVERALL CHANGE
