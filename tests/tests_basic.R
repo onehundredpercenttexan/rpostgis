@@ -105,9 +105,7 @@ rm(pts,pts.sponly,bnd,lin,poly,rast, conn, conn2, drv)
 #######################
 #######################
 
-# now do the same tests with Postgres() driver from RPostgres (don't even load package though)
-setwd("C:/David")
-
+# now do the same tests with Postgres() driver from RPostgres (package not loaded though)
 library(rpostgis)
 library(RPostgres)
 drv<-Postgres()
