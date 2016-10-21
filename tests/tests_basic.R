@@ -1,6 +1,5 @@
 # rpostgis tests
 # These are most basic tests to ensure all functions are working
-setwd("C:/David")
 
 tryCatch({
 library(rpostgis)
