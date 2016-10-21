@@ -1,10 +1,9 @@
 rpostgis
 ========
 
-This is the development area for the package `rpostgis`, which provides additional functions to the
-`RPostgreSQL` package to interface R with a PostGIS-enabled database, as well as convenient wrappers to common PostgreSQL queries.
+This is the development area for the package `rpostgis`, which provides functions to interface R with a PostGIS-enabled PostgreSQL databases, as well as convenient wrappers to common PostgreSQL queries.
 
-All functions require a database connection object (from the `RPostgreSQL` package) to a PostgreSQL database, e.g.:
+All functions require a database connection object (e.g., from the `RPostgreSQL` package) to a PostgreSQL database, e.g.:
 
     conn<-dbConnect("PostgreSQL",dbname='db_name',host='localhost',port='5432',user='postgres',password='PASSWORD')
 
