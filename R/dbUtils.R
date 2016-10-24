@@ -110,3 +110,22 @@ dbBuildTableQuery <- function (conn = NULL, name, obj, field.types = NULL, row.n
     paste("CREATE TABLE ", nameque , "\n(", paste(flds, 
         collapse = ",\n\t"), "\n);")
 }
+
+## dbExistsTable
+
+##' Check if a PostgreSQL table exists
+##' 
+##' @param conn A PostgreSQL connection
+##' @param name Table name string, length 1-2.
+##' 
+##' @note Adapted from RPostgreSQL::dbExistsTable
+##' @keywords internal
+
+dbExistsTable <- function (conn, name) {
+    full.name<-dbTableNameFix(conn,name, as.identifier = FALSE)
+    chk<-dbGetQuery(conn, paste0("SELECT 1 FROM information_schema.tables 
+               WHERE table_schema = ",dbQuoteString(conn,full.name[1]),
+               " AND table_name = ",dbQuoteString(conn,full.name[2]),";"))[1,1]
+    if (is.null(chk) || is.na(chk)) {exists.t<-FALSE} else {exists.t<-TRUE}
+    return(exists.t)
+}
