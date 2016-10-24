@@ -51,7 +51,7 @@ dbTableNameFix <- function(conn=NULL, t.nm, as.identifier = TRUE) {
       }
     if (is.null(conn)) {conn<-DBI::ANSI()}
     if (!as.identifier) {return(t.nm)} else {
-    t.nm<-DBI::dbQuoteIdentifier(conn, t.nm)
+    t.nm<-dbQuoteIdentifier(conn, t.nm)
     return(t.nm)
     }
 }
@@ -88,7 +88,7 @@ dbBuildTableQuery <- function (conn = NULL, name, obj, field.types = NULL, row.n
 {
     if (is.null(conn)) {
       conn <- DBI::ANSI()
-      nameque <- DBI::dbQuoteIdentifier(conn,name)
+      nameque <- dbQuoteIdentifier(conn,name)
     } else {
       nameque<-paste(dbTableNameFix(conn, name),collapse = ".")
     }
@@ -100,12 +100,12 @@ dbBuildTableQuery <- function (conn = NULL, name, obj, field.types = NULL, row.n
         names(obj)[1] <- "row_names"
     }
     if (is.null(field.types)) {
-        field.types <- sapply(obj, DBI::dbDataType, dbObj = conn)
+        field.types <- sapply(obj, dbDataType, dbObj = conn)
     }
     i <- match("row_names", names(field.types), nomatch = 0)
     if (i > 0) 
-        field.types[i] <- DBI::dbDataType(conn, row.names(obj))
-    flds <- paste(DBI::dbQuoteIdentifier(conn ,names(field.types)), field.types)
+        field.types[i] <- dbDataType(conn, row.names(obj))
+    flds <- paste(dbQuoteIdentifier(conn ,names(field.types)), field.types)
     
     paste("CREATE TABLE ", nameque , "\n(", paste(flds, 
         collapse = ",\n\t"), "\n);")

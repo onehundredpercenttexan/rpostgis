@@ -5,7 +5,7 @@ tryCatch({
 library(rpostgis)
 library(RPostgreSQL)
 drv<-dbDriver("PostgreSQL")
-detach("package:RPostgreSQL")
+#detach("package:RPostgreSQL")
 library(sp)
 data("meuse")
 cred<-scan(".pgpass_rpostgis", what = "character")
@@ -16,6 +16,7 @@ conn2 <- dbConnect(drv, host = cred[1], dbname = cred[5], user = cred[3], passwo
 new_table <- c("rpostgis","db_test")
 ex_table<-c("example_data","relocations_plus")
 
+print(system.time({
 # general
 pgPostGIS(conn)
 pgListGeom(conn)
@@ -36,6 +37,7 @@ pgSRID(conn2,crs = lin@proj4string, create.srid = TRUE)
 
 # send data to database
 dbSchema(conn,new_table[1])
+dbDrop(conn,new_table,type = "table", ifexists = TRUE)
 pgInsert(conn,new_table,pts)
 pgListGeom(conn)
 
@@ -99,7 +101,8 @@ dbDrop(conn, new_table[1], type = "schema", cascade = TRUE)
 dbDisconnect(conn)
 dbDisconnect(conn2)
 rm(pts,pts.sponly,bnd,lin,poly,rast, conn, conn2, drv)
-
+})
+)
 
 #######################
 #######################
@@ -109,7 +112,7 @@ rm(pts,pts.sponly,bnd,lin,poly,rast, conn, conn2, drv)
 library(rpostgis)
 library(RPostgres)
 drv<-Postgres()
-detach("package:RPostgres")
+detach("package:RPostgreSQL")
 library(sp)
 data("meuse")
 cred<-scan(".pgpass_rpostgis", what = "character")
@@ -121,6 +124,7 @@ rm(cred)
 new_table <- c("rpostgis","db_test")
 ex_table<-c("example_data","relocations_plus")
 
+print(system.time({
 # general
 pgPostGIS(conn)
 pgListGeom(conn)
@@ -141,6 +145,7 @@ pgSRID(conn2,crs = lin@proj4string, create.srid = TRUE)
 
 # send data to database
 dbSchema(conn,new_table[1])
+dbDrop(conn,new_table,type = "table", ifexists = TRUE)
 pgInsert(conn,new_table,pts)
 pgListGeom(conn)
 
@@ -204,6 +209,8 @@ dbDrop(conn, new_table[1], type = "schema", cascade = TRUE)
 dbDisconnect(conn)
 dbDisconnect(conn2)
 rm(pts,pts.sponly,bnd,lin,poly,rast, conn, conn2, alb, meuse, drv, ex_table, new_table)
+})
+)
 print("ALL GOOD!!!")
 },
 error = function(x) {

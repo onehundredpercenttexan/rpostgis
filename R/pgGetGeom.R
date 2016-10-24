@@ -67,12 +67,12 @@ pgGetGeom <- function(conn, name, geom = "geom", gid = NULL,
             paste(tab.list, collapse = ", ")))
     }
     ## prepare geom column
-    geomque <- DBI::dbQuoteIdentifier(conn, geom)
+    geomque <- dbQuoteIdentifier(conn, geom)
     ## prepare clauses
     clauses <- sub("^where", "AND", clauses, ignore.case = TRUE)
     ## prepare other.cols
     if (!is.logical(other.cols)) {
-        other.cols <- paste(DBI::dbQuoteIdentifier(conn, other.cols), 
+        other.cols <- paste(dbQuoteIdentifier(conn, other.cols), 
             collapse = ",")
     } else {
         if (other.cols) {
@@ -153,12 +153,12 @@ pgGetPts <- function(conn, name, geom = "geom", gid = NULL, other.cols = "*",
     ## prepare additional clauses
     clauses<-sub("^where", "AND",clauses, ignore.case = TRUE)
     ## prepare geom column
-    geomque<-DBI::dbQuoteIdentifier(conn,geom)
+    geomque<-dbQuoteIdentifier(conn,geom)
     ## If ID not specified, set it to generate row numbers
     if (is.null(gid)) {
         gid <- "row_number() over()"
     } else {
-      gid<-DBI::dbQuoteIdentifier(conn,gid)
+      gid<-dbQuoteIdentifier(conn,gid)
     }
     ## Check if MULTI or single geom
     sql_query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque,
@@ -272,12 +272,12 @@ pgGetLines <- function(conn, name, geom = "geom", gid = NULL,
     clauses<-sub("^where", "AND",clauses, ignore.case = TRUE)
     
     ## prepare geom column
-    geomque<-DBI::dbQuoteIdentifier(conn,geom)
+    geomque<-dbQuoteIdentifier(conn,geom)
     ## Check gid
     if (is.null(gid)) {
         gid <- "row_number() over()"
     } else {
-      gid<-DBI::dbQuoteIdentifier(conn,gid)
+      gid<-dbQuoteIdentifier(conn,gid)
     }
     ## Retrieve the SRID
     sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
@@ -366,12 +366,12 @@ pgGetPolys <- function(conn, name, geom = "geom", gid = NULL,
     ## prepare additional clauses
     clauses<-sub("^where", "AND",clauses, ignore.case = TRUE)
     ## prepare geom column
-    geomque<-DBI::dbQuoteIdentifier(conn,geom)
+    geomque<-dbQuoteIdentifier(conn,geom)
     ## Check gid
     if (is.null(gid)) {
         gid <- "row_number() over()"
     } else {
-      gid<-DBI::dbQuoteIdentifier(conn,gid)
+      gid<-dbQuoteIdentifier(conn,gid)
     }
     ## Retrieve the SRID
     sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",

@@ -37,12 +37,12 @@ dbAddKey <- function(conn, name, colname, type = c("primary",
     ## Check and prepare the schema.name
     name <- dbTableNameFix(conn,name)
     nameque <- paste(name, collapse = ".")
-    colname<-DBI::dbQuoteIdentifier(conn,colname)
+    colname<-dbQuoteIdentifier(conn,colname)
     if (missing(colref)) {
       # If no reference, empty string
       colref <- "" 
       } else { 
-      colref<-DBI::dbQuoteIdentifier(conn,colref)
+      colref<-dbQuoteIdentifier(conn,colref)
       }
     ## 'type' in upper case
     type <- toupper(match.arg(type))
@@ -107,7 +107,7 @@ dbAsDate <- function(conn, name, date = "date", tz = NULL, display = TRUE,
     ## Check and prepare the schema.name and date column
     name <- dbTableNameFix(conn,name)
     nameque <- paste(name, collapse = ".")
-    date <- DBI::dbQuoteIdentifier(conn, date)
+    date <- dbQuoteIdentifier(conn, date)
     ## With or without time zones?
     timestamp <- ifelse(is.null(tz), "timestamp", "timestamptz")
     ## What time zone?
@@ -177,7 +177,7 @@ dbColumn <- function(conn, name, colname, action = c("add", "drop"),
     ## Check and prepare the schema.name
     name <- dbTableNameFix(conn,name)
     nameque <- paste(name, collapse = ".")
-    colname<-DBI::dbQuoteIdentifier(conn,colname)
+    colname<-dbQuoteIdentifier(conn,colname)
     ## Check and translate to upper case the action
     action <- toupper(match.arg(action))
     ## 'args' for the coltype or cascade
@@ -239,7 +239,7 @@ dbComment <- function(conn, name, comment, type = c("table",
       nameque <- paste(name, collapse = ".")
     } else {
       if (length(name) > 1) {stop("Schemas should be a character of length = 1.")}
-      nameque<-DBI::dbQuoteIdentifier(conn,name)
+      nameque<-dbQuoteIdentifier(conn,name)
     }
     ## Escape single "'"
     comment<-gsub("'","''",comment)
@@ -303,7 +303,7 @@ dbDrop <- function(conn, name, type = c("table", "view", "schema"),
       nameque <- paste(name, collapse = ".")
     } else {
       if (length(name) > 1) {stop("Schemas should be a character of length = 1.")}
-      nameque<-DBI::dbQuoteIdentifier(conn,name)
+      nameque<-dbQuoteIdentifier(conn,name)
     }
     ## Argument IF EXISTS
     ifexists <- ifelse(ifexists, " IF EXISTS ", " ")
@@ -373,14 +373,14 @@ dbIndex <- function(conn, name, colname, idxname, unique = FALSE,
     ## Check and prepare the schema.name and column name
     name <- dbTableNameFix(conn,name)
     nameque <- paste(name, collapse = ".")
-    colname<-DBI::dbQuoteIdentifier(conn,colname)
+    colname<-dbQuoteIdentifier(conn,colname)
     ## Check and prepare the name of the index
     if (missing(idxname)) {
-        idxname <- DBI::dbQuoteIdentifier(conn,
+        idxname <- dbQuoteIdentifier(conn,
             paste(gsub('"','',name[length(name)]), gsub('"','',colname), "idx",
             sep = "_"))
         } else {
-        idxname<-DBI::dbQuoteIdentifier(conn,idxname)      
+        idxname<-dbQuoteIdentifier(conn,idxname)      
             }
     ## Argument UNIQUE
     unique <- ifelse(unique, "UNIQUE ", "")
@@ -438,8 +438,8 @@ dbSchema <- function(conn, name, display = TRUE, exec = TRUE) {
     if (length(name) != 1)
         stop("The schema name should be of length 1.")
     ## make schema name
-    namechar<-DBI::dbQuoteString(conn,name)
-    nameque<-DBI::dbQuoteIdentifier(conn,name)
+    namechar<-dbQuoteString(conn,name)
+    nameque<-dbQuoteIdentifier(conn,name)
     ## Check existence of the schema
     sql_query <- paste0("SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = ",
         namechar, ");")
@@ -496,7 +496,7 @@ dbTableInfo <- function(conn, name, allinfo = FALSE) {
         cols <- "column_name,data_type,is_nullable,character_maximum_length"
     }
     df <- dbGetQuery(conn, paste0("SELECT ", cols, " FROM information_schema.columns\nWHERE table_schema = ",
-        DBI::dbQuoteString(conn,name[1]), " AND table_name = ", DBI::dbQuoteString(conn,name[2]), ";"))
+        dbQuoteString(conn,name[1]), " AND table_name = ", dbQuoteString(conn,name[2]), ";"))
     return(df)
 }
 

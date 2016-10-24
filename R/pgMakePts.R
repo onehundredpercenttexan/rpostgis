@@ -45,9 +45,9 @@ pgMakePts <- function(conn, name, colname = "geom", x = "x",
     ## Check and prepare the schema.table name
     nameque <- paste(dbTableNameFix(conn,name), collapse = ".")
     ## Prepare column names
-    colnameque <- DBI::dbQuoteIdentifier(conn, colname)
-    x <- DBI::dbQuoteIdentifier(conn, x)
-    y <- DBI::dbQuoteIdentifier(conn, y)
+    colnameque <- dbQuoteIdentifier(conn, colname)
+    x <- dbQuoteIdentifier(conn, x)
+    y <- dbQuoteIdentifier(conn, y)
     ## Stop if no SRID
     if (missing(srid))
         stop("A valid SRID should be provided.")
@@ -130,11 +130,11 @@ pgMakeStp <- function(conn, name, colname = "geom", x = "x",
     ## Check and prepare the schema.table name
     nameque <- paste(dbTableNameFix(conn,name), collapse = ".")
     ## Prepare column names
-    colnameque <- DBI::dbQuoteIdentifier(conn, colname)
-    x <- DBI::dbQuoteIdentifier(conn, x)
-    y <- DBI::dbQuoteIdentifier(conn, y)
-    dx <- DBI::dbQuoteIdentifier(conn, dx)
-    dy <- DBI::dbQuoteIdentifier(conn, dy)
+    colnameque <- dbQuoteIdentifier(conn, colname)
+    x <- dbQuoteIdentifier(conn, x)
+    y <- dbQuoteIdentifier(conn, y)
+    dx <- dbQuoteIdentifier(conn, dx)
+    dy <- dbQuoteIdentifier(conn, dy)
     ## Stop if no SRID
     if (missing(srid))
         stop("A valid SRID should be provided.")

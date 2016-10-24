@@ -65,7 +65,6 @@
 ##' @keywords internal
 ##' @importFrom stats na.omit
 ##' @importFrom rgeos writeWKT
-##' @importFrom DBI dbDriver
 ##' @return pgi A list containing four character strings: (1)
 ##'     in.table, the table name which will be created or inserted
 ##'     into, if specifed by either create.table or force.match (else
