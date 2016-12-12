@@ -82,9 +82,10 @@ pgGetGeom <- function(conn, name, geom = "geom", gid = NULL,
         }
     }
     ## check type
-    sql_query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque, 
-        ") AS type FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ", 
-        clauses, ";")
+    sql_query <- paste0("SELECT DISTINCT a.geo AS type 
+                        FROM (SELECT ST_GeometryType(", geomque, 
+                        ") as geo FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ", 
+                        clauses, ") a;")
     typ <- dbGetQuery(conn, sql_query)$type
     # assign to correct function
     if (length(typ) == 0) {
@@ -161,13 +162,15 @@ pgGetPts <- function(conn, name, geom = "geom", gid = NULL, other.cols = "*",
       gid<-dbQuoteIdentifier(conn,gid)
     }
     ## Check if MULTI or single geom
-    sql_query <- paste0("SELECT DISTINCT ST_GeometryType(", geomque,
-        ") AS type FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ",
-        clauses , ";")
+    sql_query <- paste0("SELECT DISTINCT a.geo AS type 
+                        FROM (SELECT ST_GeometryType(", geomque, 
+                        ") as geo FROM ", nameque, " WHERE ", geomque, " IS NOT NULL ", 
+                        clauses, ") a;")
     typ <- dbGetQuery(conn, sql_query)
     ## Retrieve the SRID
-    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
-        nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
+    sql_query <- paste0("SELECT DISTINCT a.s as st_srid FROM
+                        (SELECT ST_SRID(", geomque, ") as s FROM ",
+                        nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ") a;")
     srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
@@ -280,8 +283,9 @@ pgGetLines <- function(conn, name, geom = "geom", gid = NULL,
       gid<-dbQuoteIdentifier(conn,gid)
     }
     ## Retrieve the SRID
-    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
-        nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
+    sql_query <- paste0("SELECT DISTINCT a.s as st_srid FROM
+                        (SELECT ST_SRID(", geomque, ") as s FROM ",
+                        nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ") a;")
     srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {
@@ -374,8 +378,9 @@ pgGetPolys <- function(conn, name, geom = "geom", gid = NULL,
       gid<-dbQuoteIdentifier(conn,gid)
     }
     ## Retrieve the SRID
-    sql_query <- paste0("SELECT DISTINCT(ST_SRID(", geomque, ")) FROM ",
-        nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ";")
+    sql_query <- paste0("SELECT DISTINCT a.s as st_srid FROM
+                        (SELECT ST_SRID(", geomque, ") as s FROM ",
+                        nameque, " WHERE ", geomque, " IS NOT NULL ", clauses , ") a;")
     srid <- dbGetQuery(conn, sql_query)
     ## Check if the SRID is unique, otherwise throw an error
     if (nrow(srid) > 1) {

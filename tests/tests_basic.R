@@ -23,7 +23,8 @@ pgListGeom(conn)
 
 # retrieval functions
 pts<-pgGetGeom(conn, ex_table , geom = "geom")
-poly<-pgGetGeom(conn2, c("env_data","adm_boundaries"))
+pts2<-pgGetGeom(conn, ex_table , geom = "geom", clauses = "where id = 'continental' order by time limit 100")
+poly<-pgGetGeom(conn2, c("env_data","adm_boundaries"), clauses = "order by nome_com")
 lin<-pgGetGeom(conn2,c("env_data","roads"))
 bnd<-pgGetBoundary(conn, ex_table)
 rast<-pgGetRast(conn2,c("env_data","corine_land_cover"))
@@ -131,7 +132,8 @@ pgListGeom(conn)
 
 # retrieval functions
 pts<-pgGetGeom(conn, ex_table , geom = "geom")
-poly<-pgGetGeom(conn2, c("env_data","adm_boundaries"))
+pts2<-pgGetGeom(conn, ex_table , geom = "geom", clauses = "where id = 'continental' order by time limit 100")
+poly<-pgGetGeom(conn2, c("env_data","adm_boundaries"), clauses = "order by nome_com")
 lin<-pgGetGeom(conn2,c("env_data","roads"))
 bnd<-pgGetBoundary(conn, ex_table)
 rast<-pgGetRast(conn2,c("env_data","corine_land_cover"))
